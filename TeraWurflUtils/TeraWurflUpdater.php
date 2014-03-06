@@ -61,8 +61,11 @@ class TeraWurflUpdater {
 	}
 	
 	protected function checkLogFile() {
-		$logfile = TeraWurflConfig::$LOG_FILE;
+		$logfile = $this->wurfl->rootdir.TeraWurflConfig::$DATADIR.TeraWurflConfig::$LOG_FILE;
 		if (!file_exists($logfile)) {
+			 if (!is_writable($this->wurfl->rootdir.TeraWurflConfig::$DATADIR)) {
+			 	throw new TeraWurflException("Logfile does not exist and it cannot be created because the data dir is not writable");
+			 }
 			 if (!touch($logfile)) {
 			 	throw new TeraWurflException("Unable to create logfile");
 			 }
@@ -162,7 +165,7 @@ class TeraWurflUpdateDownloader {
 	}
 	
 	protected function checkPermissions() {
-		if(!file_exists($this->wurfl_file_zipped) && !is_writable(TeraWurflConfig::$TEMPDIR)){
+		if(!file_exists($this->wurfl_file_zipped) && !is_writable($this->wurfl->rootdir.TeraWurflConfig::$DATADIR)){
 			$this->wurfl->toLog("Cannot write to data directory (permission denied)",LOG_ERR);
 			throw new TeraWurflException("Fatal Error: Cannot write to data directory (permission denied). (".$this->wurfl->rootdir.TeraWurflConfig::$DATADIR.")\n\nPlease make the data directory writable by the user or group that runs the webserver process, in Linux this command would do the trick if you're not too concerned about security: chmod -R 777 ".$this->wurfl->rootdir.TeraWurflConfig::$DATADIR);
 		}
